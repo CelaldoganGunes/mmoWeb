@@ -5,44 +5,58 @@ const https = require('https');
 const http = require('http');
 const fs = require('fs');
 
+const config = require('./config.js');
+
 let app = Express();
-let port = 443;
+let port = config.dotenv.HTTP_PORT;
 
-if (fs.existsSync('./ssl/privkey.pem'))
+http.createServer(app).listen(port, function() {
+    console.log(`HTTP Server running on port ${port}`);
+});
+
+if (process.env.NODE_ENV == "production")
 {
-    
-    const httpServer = http.createServer(app);
-
-    httpServer.listen(80, () => {
-        console.log('HTTP Server running on port 80');
-    });
-
-    const httpsServer = https.createServer({
+    let sslPort = config.dotenv.HTTPS_PORT;
+    const optionSSL = {
         key: fs.readFileSync('./ssl/privkey.pem'),
         cert: fs.readFileSync('./ssl/fullchain.pem'),
-    }, app);
+    };
     
-    httpsServer.listen(port, () => {
-        console.log(`HTTPS Server running on port ${port}`);
-    });
-}
-else
-{
-    let apiServer = app.listen(port, function() {
-        console.log(`Web Server is listening on port ${port}`)
+    https.createServer(optionSSL, app).listen(sslPort, function() {
+        console.log(`HTTPS Server running on port ${sslPort}`);
     });
 }
 
-app.all('/discord', async function(req, res) {
+app.all("*", function(req, res, next) {
+    if (req.secure == false)
+    {
+        res.redirect("https://" + req.headers.host + req.path);
+        return;
+    }
+    next();
+});
+
+app.get('/test', function(req, res) {
+    res.send("Test");
+    return;
+});
+
+app.get('/discord', function(req, res) {
     res.redirect("https://discord.gg/pBewnuaV4U");
     return;
 });
 
-app.all('/', async function(req, res) {
+app.get('/steam', function(req, res) {
+    res.redirect("https://store.steampowered.com/app/2113200/");
+    return;
+});
+
+app.all('/', function(req, res) {
     res.redirect("https://celal1387.itch.io/1387mmo");
     return;
 });
 
 app.all('*', function(req, res) {
-    res.redirect("http://1387mmo.net/");
+    res.redirect('/');
+    return;
 });
