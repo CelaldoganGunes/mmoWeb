@@ -6,6 +6,7 @@ const http = require('http');
 const fs = require('fs');
 
 const config = require('./config.js');
+let playerList = require('./playerList.js');
 
 let app = Express();
 let port = config.dotenv.HTTP_PORT;
@@ -14,7 +15,7 @@ http.createServer(app).listen(port, function() {
     console.log(`HTTP Server running on port ${port}`);
 });
 
-if (process.env.NODE_ENV == "production")
+if (config.dotenv.NODE_ENV == "production")
 {
     let sslPort = config.dotenv.HTTPS_PORT;
     const optionSSL = {
@@ -28,7 +29,7 @@ if (process.env.NODE_ENV == "production")
 }
 
 app.all("*", function(req, res, next) {
-    if (req.secure == false)
+    if (config.dotenv.NODE_ENV == "production" && req.secure == false)
     {
         res.redirect("https://" + req.headers.host + req.path);
         return;
@@ -48,6 +49,11 @@ app.get('/discord', function(req, res) {
 
 app.get('/steam', function(req, res) {
     res.redirect("https://store.steampowered.com/app/2113200/");
+    return;
+});
+
+app.get('/alphaWorld', function(req, res) {
+    res.send(playerList.getPlayerList());
     return;
 });
 
