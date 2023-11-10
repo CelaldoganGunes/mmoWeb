@@ -57,6 +57,41 @@ app.get('/alphaWorld', function(req, res) {
     return;
 });
 
+app.get('/alphaWorld/playerCount', function(req, res) {
+    let arr = playerList.getPlayerList();
+    let playerCount = arr.length;
+    let obj = {playerCount};
+    res.send(obj);
+    return;
+});
+
+app.get('/alphaWorld/:playerID', async function(req, res) {
+    let playerID = req.params.playerID;
+
+    let playerAllData = await playerList.getPlayerData(playerID);
+
+    if (playerAllData == null)
+    {
+        return res.send(false);
+    }
+
+    let playerData =  JSON.parse(playerAllData.data);
+    let inventory = playerData.inventory;
+    let food = inventory.food * 25 / 100;
+    let gold = inventory.gold * 25 / 100;
+
+    let obj = {
+        player_id : playerAllData.player_id,
+        username : playerAllData.username,
+        food : food,
+        gold : gold
+
+    }
+
+    res.send(obj);
+    return;
+});
+
 app.all('/', function(req, res) {
     res.redirect("https://celal1387.itch.io/1387mmo");
     return;
