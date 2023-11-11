@@ -4,6 +4,7 @@ const Express = require('express');
 const https = require('https');
 const http = require('http');
 const fs = require('fs');
+const path = require('path');
 
 const config = require('./config.js');
 let playerList = require('./playerList.js');
@@ -92,10 +93,13 @@ app.get('/alphaWorld/:playerID', async function(req, res) {
     return;
 });
 
+/*
 app.all('/', function(req, res) {
     res.redirect("https://celal1387.itch.io/1387mmo");
     return;
-});
+});*/
+
+app.use('/', Express.static(path.join(__dirname, '/client')));
 
 app.all('*', function(req, res) {
     res.redirect('/');
