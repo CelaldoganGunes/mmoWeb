@@ -52,6 +52,11 @@ app.get('/steam', function(req, res) {
     return;
 });
 
+app.get('/steamFromInstagram', function(req, res) {
+    res.redirect("https://store.steampowered.com/app/2113200?utm_source=instagram");
+    return;
+});
+
 /*
 app.all('/', function(req, res) {
     res.redirect("https://celal1387.itch.io/1387mmo");
