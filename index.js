@@ -40,6 +40,11 @@ app.all("*", function(req, res, next) {
     next();
 });*/
 
+app.all("*", function(req, res, next) {
+    logRequest(req);
+    next()
+});
+
 app.get('/test', function(req, res) {
     res.send("Test");
     return;
@@ -83,14 +88,19 @@ const formatMemoryUsage = (data) => `${Math.round(data / 1024 / 1024 * 100) / 10
 
 const memoryData = process.memoryUsage();
 
-const memoryUsage = {
-  rss: `${formatMemoryUsage(memoryData.rss)} -> Resident Set Size - total memory allocated for the process execution`,
-  heapTotal: `${formatMemoryUsage(memoryData.heapTotal)} -> total size of the allocated heap`,
-  heapUsed: `${formatMemoryUsage(memoryData.heapUsed)} -> actual memory used during the execution`,
-  external: `${formatMemoryUsage(memoryData.external)} -> V8 external memory`,
-};
+const memoryUsage = `rss: ${formatMemoryUsage(memoryData.rss)} | heapTotal: ${formatMemoryUsage(memoryData.heapTotal)} | heapUsed: ${formatMemoryUsage(memoryData.heapUsed)} | external V8: ${formatMemoryUsage(memoryData.external)}`
 
 setInterval(() => {
+    console.log("");
     console.log(new Date().toISOString());
     console.log(memoryUsage);
+    console.log("");
 }, 5 * 1000);
+
+function logRequest(req)
+{
+    let fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
+    let ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress ;
+    
+    console.log(`${ip} - ${fullUrl} - ${req.method}`);
+}
