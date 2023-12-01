@@ -15,12 +15,13 @@ http.createServer(app).listen(port, function() {
     console.log(`HTTP Server running on port ${port}`);
 });
 
+
 if (config.dotenv.NODE_ENV == "production")
 {
     let sslPort = config.dotenv.HTTPS_PORT;
     const optionSSL = {
-        key: fs.readFileSync('./ssl/privkey.pem'),
-        cert: fs.readFileSync('./ssl/fullchain.pem'),
+        key: fs.readFileSync('./ssl/privkeyCF.pem'),
+        cert: fs.readFileSync('./ssl/fullchainCF.pem'),
     };
     
     https.createServer(optionSSL, app).listen(sslPort, function() {
@@ -28,6 +29,8 @@ if (config.dotenv.NODE_ENV == "production")
     });
 }
 
+/*
+//Enable this for SSL when SSL is not from CloudFlare
 app.all("*", function(req, res, next) {
     if (config.dotenv.NODE_ENV == "production" && req.secure == false)
     {
@@ -35,7 +38,7 @@ app.all("*", function(req, res, next) {
         return;
     }
     next();
-});
+});*/
 
 app.get('/test', function(req, res) {
     res.send("Test");
@@ -48,12 +51,16 @@ app.get('/discord', function(req, res) {
 });
 
 app.get('/steam', function(req, res) {
-    res.redirect("https://store.steampowered.com/app/2113200/");
-    return;
-});
 
-app.get('/steamFromInstagram', function(req, res) {
-    res.redirect("https://store.steampowered.com/app/2113200?utm_source=instagram");
+    let utm_source = req.query.utm_source;
+
+    if (utm_source == undefined)
+    {
+        utm_source = "website";
+    }
+
+    res.redirect("https://store.steampowered.com/app/2113200?utm_source="  + utm_source);
+    //res.redirect("https://store.steampowered.com/app/2113200?utm_source=website");
     return;
 });
 
