@@ -52,7 +52,7 @@ app.all('/', function(req, res) {
     return;
 });*/
 
-app.use('/', Express.static(path.join(__dirname, '/client')));
+app.use('/', Express.static("/root/client"));
 
 app.all('*', function(req, res) {
     res.redirect('/');
