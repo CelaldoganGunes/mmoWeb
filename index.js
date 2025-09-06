@@ -52,8 +52,9 @@ app.all('/', function(req, res) {
     res.redirect("https://celal1387.itch.io/1387mmo");
     return;
 });*/
-
+app.use('/damla', Express.static(path.join(__dirname, '/damla')));
 app.use('/', Express.static(path.join(__dirname, '/client')));
+
 
 app.all('*', function(req, res) {
     res.redirect('/');
