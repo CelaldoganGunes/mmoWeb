@@ -76,14 +76,33 @@ setInterval(() => {
     console.log("");
 }, 5 * 1000);
 
-function logRequest(req)
-{
-    let fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
-    console.log(req.headers['x-forwarded-for'])
-    console.log(req.socket.remoteAddress)
-    console.log(req.ip)
-    console.log(req.ips)
-    let ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress ;
-    
-    console.log(`${ip} - ${fullUrl} - ${req.method}`);
+function getClientIp(req) {
+  // 1) Cloudflare (tüm planlarda) – tek ve güvenilir header
+  const cf = req.headers['cf-connecting-ip'];
+  if (cf) return normalizeIp(cf);
+
+  // 2) Enterprise varsa True-Client-IP gelebilir
+  const trueClient = req.headers['true-client-ip'];
+  if (trueClient) return normalizeIp(trueClient);
+
+  // 3) Standart proxy zinciri
+  const xff = req.headers['x-forwarded-for'];
+  if (xff) return normalizeIp(xff.split(',')[0].trim());
+
+  // 4) Express / Node socket
+  if (req.ip) return normalizeIp(req.ip);
+  return normalizeIp(req.socket?.remoteAddress);
+}
+
+function normalizeIp(ip) {
+  // IPv6 ve IPv4-mapped IPv6'ları sadeleştir
+  if (ip.startsWith('::ffff:')) return ip.substring(7);
+  if (ip === '::1') return '127.0.0.1';
+  return ip;
+}
+
+function logRequest(req) {
+  const fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
+  const ip = getClientIp(req);
+  console.log(`${ip} - ${fullUrl} - ${req.method}`);
 }
