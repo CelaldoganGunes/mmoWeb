@@ -80,6 +80,8 @@ function logRequest(req)
     let fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
     console.log(req.headers['x-forwarded-for'])
     console.log(req.socket.remoteAddress)
+    console.log(req.ip)
+    console.log(req.ips)
     let ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress ;
     
     console.log(`${ip} - ${fullUrl} - ${req.method}`);
