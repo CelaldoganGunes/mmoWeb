@@ -15,31 +15,6 @@ http.createServer(app).listen(port, function() {
     console.log(`HTTP Server running on port ${port}`);
 });
 
-
-if (config.dotenv.NODE_ENV == "production")
-{
-    let sslPort = config.dotenv.HTTPS_PORT;
-    const optionSSL = {
-        key: fs.readFileSync('./ssl/privkeyCF.pem'),
-        cert: fs.readFileSync('./ssl/fullchainCF.pem'),
-    };
-    
-    https.createServer(optionSSL, app).listen(sslPort, function() {
-        console.log(`HTTPS Server running on port ${sslPort}`);
-    });
-}
-
-/*
-//Enable this for SSL when SSL is not from CloudFlare
-app.all("*", function(req, res, next) {
-    if (config.dotenv.NODE_ENV == "production" && req.secure == false)
-    {
-        res.redirect("https://" + req.headers.host + req.path);
-        return;
-    }
-    next();
-});*/
-
 app.all("*", function(req, res, next) {
     logRequest(req);
     next()
