@@ -18,6 +18,7 @@ http.createServer(app).listen(port, function() {
 });
 
 app.all("*", function(req, res, next) {
+    console.log(__dirname);
     logRequest(req);
     next()
 });
@@ -52,7 +53,7 @@ app.all('/', function(req, res) {
     return;
 });*/
 
-app.use('/', Express.static("/root/client"));
+app.use('/', Express.static(path.join(__dirname, '/client')));
 
 app.all('*', function(req, res) {
     res.redirect('/');
@@ -77,6 +78,8 @@ setInterval(() => {
 function logRequest(req)
 {
     let fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
+    console.log(req.headers['x-forwarded-for'])
+    console.log(req.socket.remoteAddress)
     let ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress ;
     
     console.log(`${ip} - ${fullUrl} - ${req.method}`);
