@@ -11,6 +11,8 @@ const config = require('./config.js');
 let app = Express();
 let port = config.dotenv.HTTP_PORT;
 
+app.set('trust proxy', true);
+
 http.createServer(app).listen(port, function() {
     console.log(`HTTP Server running on port ${port}`);
 });
